@@ -4,7 +4,7 @@ seaget
 Wget like tool to dump seagate memory and buffer
 This are all the scripts I hacked together.This is neither refined nor cleaned.
 
-Usage is simple:
+Usage is simple:<br>
 python2 see.py device dumpfile baud
 
 Default baud should be 38400 maximum is 115200
