@@ -1,5 +1,13 @@
 #!/usr/bin/python2
-#clean rewrite and combination of all my old python scripts
+# clean rewrite and combination of all my old python scripts
+# TODO:
+# - get basic functions []
+# - add advances functions like:
+#       looking for password at address $foo
+#       write to buffer/memory
+#       search for password without dumping
+#       add devices with known address
+
 import argparse
 try:
     import serial
@@ -11,6 +19,7 @@ import sys,os,re,time
 class SeaGet():
     def __init__(self,baud, cont, dumptype, filename, device, new_baud=False):
         ser = serial.Serial(port=device, baudrate=baud, bytesize=8,parity='N',stopbits=1,timeout=0.1)
+
 
 def main():
     parser = argparse.ArgumentParser(description='Dump memory/buffer of a seagate hd using a serial connection.')
