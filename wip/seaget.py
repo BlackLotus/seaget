@@ -22,6 +22,7 @@ class SeaGet():
     timeout=0.002
     def send(self,command):
         #if this doesn't work for you try setting a greater timeout (to be on the safe side try 1)
+        #zc is there zerocounter
         incom=[""]
         line=True
         zc=0
@@ -109,11 +110,14 @@ class SeaGet():
         bin=hex.decode("hex")
         return hex,bin
 
-    def read_buffer(self):
-        pass
+    def read_buffer(self,hexa):
+        #hexa xxxx
+        #hexa is the address you want to read in hex
+        res,modus=self.send('B'+str(hexa))
+        return self.parse(res)
         
     def read_memory(self,hexa):
-        #hexa=xxxx
+        #hexa xxxx
         #hexa is the address you want to read in hex
         #it always gives you 256bytes
         resp,modus=self.send('D00,'+str(num))
