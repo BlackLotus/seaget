@@ -8,12 +8,13 @@
 #       search for password without dumping []
 #       add devices with known address []
 
-import argparse
 try:
     import serial
 except:
     print 'You have to install pyserial'
     quit()
+
+import argparse
 import sys,os,re,time
 
 class SeaGet():
@@ -25,11 +26,10 @@ class SeaGet():
         incom=[""]
         line=True
         self.ser.write(command+"\n")
-        zc=0
         while line!="":
             try:
                 line=self.ser.readline()
-                line=self.ser.read(1000)
+#                line=self.ser.read(1000)
                 incom.append(line)
             except:
                 print 'Failed to read line.Maybe the timeout is too low'
