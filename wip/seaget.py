@@ -17,9 +17,27 @@ except:
 import sys,os,re,time
 
 class SeaGet():
+    debug=0
+
+    def send():
+        pass
+
     def __init__(self,baud, cont, dumptype, filename, device, new_baud=False):
         ser = serial.Serial(port=device, baudrate=baud, bytesize=8,parity='N',stopbits=1,timeout=0.1)
+        #set right diagnostic mode
+        ser.write("\x1A\n")
 
+    def read_buffer():
+        pass
+        
+    def read_memory():
+        pass
+
+    def dump_buffer():
+        pass
+        
+    def dump_memory():
+        pass
 
 def main():
     parser = argparse.ArgumentParser(description='Dump memory/buffer of a seagate hd using a serial connection.')
