@@ -19,13 +19,53 @@ import sys,os,re,time
 class SeaGet():
     debug=0
 
-    def send():
-        pass
+    def send(self,command):
+    #I'm not sure how to safely break this
+    #I have added a ZeroCounter (zc) so that it won't run forever
+        incom=[""]
+        line=True
+        self.ser.write(command+"\n")
+        zc=0
+        while 1:
+            try:
+                line=self.ser.readline()
+                line=self.ser.read(1000)
+                if line=="":
+                    zc+=1
+                else:
+                    zc=0
+                incom.append(line)
+                if zc==300:
+                    break
+            except:
+                print 'Failed to read line.Maybe the timeout is too low'
+                break
+        incom="".join(incom)
+        #You can (and have to) set different modi for the hd.
+        #a different modus means you get a different set of commands
+        #checking the modi after every command can be used for debugging and/or to verify that a command got executed correctly
+        try:
+            modus=re.findall('F3 (.)>',incom)
+            modus=modus[len(modus)-1]
+        except:
+            print 'Failed to execute regex.This usually means that you didn\'t get the whole message or nothing at all'
+            print 'Check your baud rate and timeout/zc'
+            quit()
+        return incom,modus
+
 
     def __init__(self,baud, cont, dumptype, filename, device, new_baud=False):
-        ser = serial.Serial(port=device, baudrate=baud, bytesize=8,parity='N',stopbits=1,timeout=0.1)
-        #set right diagnostic mode
-        ser.write("\x1A\n")
+        self.ser = serial.Serial(port=device, baudrate=baud, bytesize=8,parity='N',stopbits=1,timeout=0)
+        resp=self.send("\x1A")
+        if resp[1]!="T" and resp[1]!="1":
+            print "Something went probably wrong"
+            print "Modus is "+resp[1]
+            quit()
+        #set the right mode to access memory and buffer
+        resp=self.send("/1")
+        if resp[1]!="1":
+            print 'Couldn\'t set modus to 1'
+            quit()
 
     def read_buffer():
         pass
