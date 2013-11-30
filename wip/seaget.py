@@ -21,8 +21,7 @@ class SeaGet():
     debug=0
     timeout=0.005
     def send(self,command):
-    #I'm not sure how to safely break this
-    #I have added a ZeroCounter (zc) so that it won't run forever
+        #if this doesn't work for you try setting a greater timeout (to be on the safe side try 1)
         incom=[""]
         line=True
         self.ser.write(command+"\n")
