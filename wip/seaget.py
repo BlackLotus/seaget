@@ -19,15 +19,22 @@ import sys,os,re,time
 
 class SeaGet():
     debug=0
-    timeout=0.005
+    timeout=0.002
     def send(self,command):
         #if this doesn't work for you try setting a greater timeout (to be on the safe side try 1)
         incom=[""]
         line=True
+        zc=0
         self.ser.write(command+"\n")
-        while line!="":
+        while 1:
             try:
                 line=self.ser.readline()
+                if line=="":
+                    zc+=1
+                else:
+                    zc=0
+                if zc==500:
+                    break
 #                line=self.ser.read(1000)
                 incom.append(line)
             except:
@@ -43,6 +50,7 @@ class SeaGet():
         except:
             print 'Failed to execute regex.This usually means that you didn\'t get the whole message or nothing at all'
             print 'Check your baud rate and timeout/zc'
+            print incom
             quit()
         return incom,modus
 
@@ -65,7 +73,10 @@ class SeaGet():
 
     def __init__(self,baud, cont, dumptype, filename, device, new_baud):
         self.ser = serial.Serial(port=device, baudrate=baud, bytesize=8,parity='N',stopbits=1,timeout=self.timeout)
+        debug=self.debug
         #start diagnostic mode
+        if debug>0:
+            print 'Start diagnostic mode'
         resp=self.send("\x1A")
         if resp[1]!="T" and resp[1]!="1":
             print "Something went probably wrong"
@@ -73,9 +84,13 @@ class SeaGet():
             quit()
         #if you want a different baud rate you get it!
         if new_baud:
+            if debug>0:
+                print 'Set new baud rate'
             self.set_baud(new_baud)
             baud=new_baud
         #set the right mode to access memory and buffer
+        if debug>0:
+            print 'Set mode /1'
         resp=self.send("/1")
         if resp[1]!="1":
             print 'Couldn\'t set modus to 1'
@@ -85,16 +100,33 @@ class SeaGet():
                 print 'Turn the hd off and on again and try the default baud rate 38400'
             quit()
 
-    def read_buffer():
-        pass
-        
-    def read_memory():
-        pass
+    def parse(self,buff):
+        hex=""
+        fooR=re.compile('[0-9A-F][0-9A-F][0-9A-F][0-9A-F][0-9A-F][0-9A-F][0-9A-F][0-9A-F]\s+(.+)\r')
+        parsed=fooR.findall(buff)
+        for line in parsed:
+            hex=hex+re.sub(' ','',line)
+        bin=hex.decode("hex")
+        return hex,bin
 
-    def dump_buffer():
+    def read_buffer(self):
         pass
         
-    def dump_memory():
+    def read_memory(self,hexa):
+        #hexa=xxxx
+        #hexa is the address you want to read in hex
+        #it always gives you 256bytes
+        resp,modus=self.send('D00,'+str(num))
+        parsed=self.parse(resp)
+        if len(parsed[1])!=512:
+            #should never happen,but could if timeout is too low
+            return False,False
+        return parsed
+
+    def dump_buffer(self):
+        pass
+        
+    def dump_memory(self):
         pass
 
 def main():
@@ -107,6 +139,7 @@ def main():
     parser.add_argument('filename', metavar='dumpfile', help='the name of the dump file, duh')
     args = parser.parse_args()
     see = SeaGet(args.baud, args.cont, args.dumptype, args.filename, args.device, args.new_baud)
-
+    print see.read_memory(00,0000)
+    
 if __name__ == '__main__':
     main()
