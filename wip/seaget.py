@@ -22,7 +22,7 @@ class SeaGet():
     timeout=0.002
     def send(self,command):
         #if this doesn't work for you try setting a greater timeout (to be on the safe side try 1)
-        #zc is there zerocounter
+        #zc is the zerocounter and used to prevent it from going forever
         incom=[""]
         line=True
         zc=0
