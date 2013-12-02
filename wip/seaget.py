@@ -52,9 +52,9 @@ class SeaGet():
         #start diagnostic mode
         if self.debug > 0:
             print('Start diagnostic mode')
-        resp = self.send("\x1A")
-        if resp[1] != "T" and resp[1] != "1":
-            sys.exit("Something has gone wrong. Modus is %s" % resp[1])
+        _, mode = self.send("\x1A")
+        if mode != "T" and mode != "1":
+            sys.exit("Something has gone wrong. Modus is %s" % mode)
 
         #if you want a different baud rate you get it!
         if new_baud:
@@ -65,10 +65,10 @@ class SeaGet():
         #set the right mode to access memory and buffer
         if self.debug > 0:
             print('Set mode /1')
-        resp = self.send("/1")
-        if resp[1] != "1":
-            exit_msgs = ["Couldn't set modus to 1. Failed with %s" % resp[0], ]
-            if re.match('Input Command Error', resp[0]) and baud != 38400:
+        incoming, mode = self.send("/1")
+        if mode != "1":
+            exit_msgs = ["Couldn't set modus to 1. Failed with %s" % incoming, ]
+            if re.match('Input Command Error', incoming) and baud != 38400:
                 exit_msgs.append('You probably set a higher baud rate, on a hd that has a bug.')
                 exit_msgs.append('Turn the hd off and on again and try the default baud rate 38400.')
             sys.exit('\n'.join(exit_msgs))
