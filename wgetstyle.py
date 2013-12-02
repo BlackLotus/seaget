@@ -6,10 +6,10 @@ stypes=['byte','KB','MB','GB','TB']
 ttypes=[['ms',1000],['s',60],['m',60],['h',24],['d',365],['y','10']]
 
 def correctsize(num,stype):
-    if num>=1024:
-        num=num/1024.0
+    if num>=1000:
+        num=num/1000.0
         stype=stype+1
-    if num>=1024:
+    if num>=1000:
         num,stype=correctsize(num,stype)
     return num,stype
 
@@ -24,11 +24,12 @@ def correcttime(num,ttype=1):
     return num,ttype
 
 def foo_to_byte(num,stype):
+    #decimal vs binary
     if stype>1:
-        num=num/1024
+        num=num/1000
         stype=stype-1
     elif stype<1:
-        num=num*1024
+        num=num*1000
         stype=stype+1
     if stype!=1:
         num,stype=foo_to_byte(num,stype)
