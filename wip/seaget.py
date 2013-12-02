@@ -8,6 +8,7 @@
 #       search for password without dumping []
 #       add devices with known address []
 
+from __future__ import print_function
 
 from argparse import ArgumentParser
 import math
@@ -49,7 +50,7 @@ class SeaGet():
         debug = self.debug
         #start diagnostic mode
         if debug > 0:
-            print 'Start diagnostic mode'
+            print('Start diagnostic mode')
         resp = self.send("\x1A")
         if resp[1] != "T" and resp[1] != "1":
             sys.exit("Something has gone wrong. Modus is %s" % resp[1])
@@ -57,12 +58,12 @@ class SeaGet():
         #if you want a different baud rate you get it!
         if new_baud:
             if debug > 0:
-                print 'Set new baud rate'
+                print('Set new baud rate')
             self.set_baud(new_baud)
             baud = new_baud
         #set the right mode to access memory and buffer
         if debug > 0:
-            print 'Set mode /1'
+            print('Set mode /1')
         resp = self.send("/1")
         if resp[1] != "1":
             exit_msgs = ["Couldn't set modus to 1. Failed with %s" % resp[0], ]
@@ -112,9 +113,9 @@ class SeaGet():
 
     def set_baud(self, newbaud):
         modus = self.get_modus()
-        print 'Setting baud to '+str(newbaud)
+        print('Setting baud to %s' % newbaud)
         if modus != "T":
-            print 'Changing mode to T'
+            print('Changing mode to T')
             self.send("/T")
         self.send("B"+str(newbaud))
         self.ser = Serial(port=device, baudrate=newbaud, bytesize=8, parity='N', stopbits=1, timeout=self.timeout)
@@ -158,8 +159,8 @@ class SeaGet():
 
             sj = math.trunc(fsize/512/64)
             si = fsize/512-64*sj
-            if self.debug>0:
-                print 'Starting from '+str(sj)+' '+str(si)
+            if self.debug > 0:
+                print('Starting from %s %s' % (sj, si))
         else:
             memf = open(filename, 'w')
             fsize = 0
@@ -169,7 +170,7 @@ class SeaGet():
         stime = time.time()  # start time
         mem = []
         
-        print 'Starting memory dump'
+        print('Starting memory dump')
         for j in range(sj, 64):
             for i in range(si, 128):
                 k += 1
