@@ -14,7 +14,7 @@ except:
     print 'You have to install pyserial'
     quit()
 from wgetstyle import progress_bar
-import argparse
+from argparse import ArgumentParser
 import math
 import re
 import time
@@ -27,7 +27,7 @@ def main():
 
 
 def get_arguments():
-    parser = argparse.ArgumentParser(description='Dump memory/buffer of a seagate hd using a serial connection.')
+    parser = ArgumentParser(description='Dump memory/buffer of a seagate hd using a serial connection.')
     parser.add_argument('--dumptype', metavar='memory/buffer', nargs=1, default='memory', help='What gets dumped')
     parser.add_argument('--baud', metavar=38400, default=38400, help='current baud rate [38400,115200]')
     parser.add_argument('--new-baud', metavar=115200, default=False, help='set new baud rate [38400,115200]')
