@@ -15,7 +15,7 @@ except:
     quit()
 from wgetstyle import progress_bar
 import argparse
-import sys,os,re,time,math
+import re,time,math
 
 
 def main():
