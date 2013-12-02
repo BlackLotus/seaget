@@ -17,6 +17,24 @@ from wgetstyle import progress_bar
 import argparse
 import sys,os,re,time,math
 
+
+def main():
+    args = get_arguments()
+    see = SeaGet(args.baud, args.cont, args.filename, args.device, args.new_baud)
+    see.dump_memory(args.filename, args.cont)
+
+
+def get_arguments():
+    parser = argparse.ArgumentParser(description='Dump memory/buffer of a seagate hd using a serial connection.')
+    parser.add_argument('--dumptype', metavar='memory/buffer', nargs=1, default='memory', help='What gets dumped')
+    parser.add_argument('--baud', metavar=38400, default=38400, help='current baud rate [38400,115200]')
+    parser.add_argument('--new-baud', metavar=115200, default=False, help='set new baud rate [38400,115200]')
+    parser.add_argument('-c', dest='cont', action='store_const', const=True, help='Continue dump')
+    parser.add_argument('--device', metavar='/dev/ttyUSB0', default='/dev/ttyUSB0', help='the serial device you use')
+    parser.add_argument('filename', metavar='dumpfile', help='the name of the dump file, duh')
+    return parser.parse_args()
+
+
 class SeaGet():
     debug=0
     timeout=0.004
@@ -166,17 +184,7 @@ class SeaGet():
     def dump_buffer(self):
         pass
 
-def main():
-    parser = argparse.ArgumentParser(description='Dump memory/buffer of a seagate hd using a serial connection.')
-    parser.add_argument('--dumptype', metavar='memory/buffer', nargs=1, default='memory', help='What gets dumped')
-    parser.add_argument('--baud', metavar=38400, default=38400, help='current baud rate [38400,115200]')
-    parser.add_argument('--new-baud', metavar=115200, default=False, help='set new baud rate [38400,115200]')
-    parser.add_argument('-c', dest='cont', action='store_const', const=True, help='Continue dump')
-    parser.add_argument('--device', metavar='/dev/ttyUSB0', default='/dev/ttyUSB0', help='the serial device you use')
-    parser.add_argument('filename', metavar='dumpfile', help='the name of the dump file, duh')
-    args = parser.parse_args()
-    see = SeaGet(args.baud, args.cont, args.filename, args.device, args.new_baud)
-    see.dump_memory(args.filename,args.cont)
+
     
 if __name__ == '__main__':
     main()
