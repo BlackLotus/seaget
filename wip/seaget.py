@@ -39,6 +39,36 @@ class SeaGet():
     debug=0
     timeout=0.004
     benchmark=0
+    
+    def __init__(self,baud, cont, filename, device, new_baud):
+        self.ser = serial.Serial(port=device, baudrate=baud, bytesize=8,parity='N',stopbits=1,timeout=self.timeout)
+        debug=self.debug
+        #start diagnostic mode
+        if debug>0:
+            print 'Start diagnostic mode'
+        resp=self.send("\x1A")
+        if resp[1]!="T" and resp[1]!="1":
+            print "Something went probably wrong"
+            print "Modus is "+resp[1]
+            quit()
+        #if you want a different baud rate you get it!
+        if new_baud:
+            if debug>0:
+                print 'Set new baud rate'
+            self.set_baud(new_baud)
+            baud=new_baud
+        #set the right mode to access memory and buffer
+        if debug>0:
+            print 'Set mode /1'
+        resp=self.send("/1")
+        if resp[1]!="1":
+            print 'Couldn\'t set modus to 1'
+            print 'Failed with '+resp[0]
+            if re.match('Input Command Error',resp[0]) and baud!=38400:
+                print 'You probably set a higher baud rate, on a hd that has a bug'
+                print 'Turn the hd off and on again and try the default baud rate 38400'
+            quit()
+
     def send(self,command):
         #if this doesn't work for you try setting a greater timeout (to be on the safe side try 1)
         #zc is the zerocounter and used to prevent it from going forever
@@ -90,34 +120,6 @@ class SeaGet():
         else:
             return False
 
-    def __init__(self,baud, cont, filename, device, new_baud):
-        self.ser = serial.Serial(port=device, baudrate=baud, bytesize=8,parity='N',stopbits=1,timeout=self.timeout)
-        debug=self.debug
-        #start diagnostic mode
-        if debug>0:
-            print 'Start diagnostic mode'
-        resp=self.send("\x1A")
-        if resp[1]!="T" and resp[1]!="1":
-            print "Something went probably wrong"
-            print "Modus is "+resp[1]
-            quit()
-        #if you want a different baud rate you get it!
-        if new_baud:
-            if debug>0:
-                print 'Set new baud rate'
-            self.set_baud(new_baud)
-            baud=new_baud
-        #set the right mode to access memory and buffer
-        if debug>0:
-            print 'Set mode /1'
-        resp=self.send("/1")
-        if resp[1]!="1":
-            print 'Couldn\'t set modus to 1'
-            print 'Failed with '+resp[0]
-            if re.match('Input Command Error',resp[0]) and baud!=38400:
-                print 'You probably set a higher baud rate, on a hd that has a bug'
-                print 'Turn the hd off and on again and try the default baud rate 38400'
-            quit()
 
     def parse(self,buff):
         hex=""
