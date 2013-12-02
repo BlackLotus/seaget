@@ -8,16 +8,18 @@
 #       search for password without dumping []
 #       add devices with known address []
 
-try:
-    import serial
-except:
-    print 'You have to install pyserial'
-    quit()
-from wgetstyle import progress_bar
+
 from argparse import ArgumentParser
 import math
 import re
+import sys
 import time
+from wgetstyle import progress_bar
+
+try:
+    from serial import Serial
+except ImportError:
+    sys.exit('You have to install pyserial')
 
 
 def main():
@@ -43,16 +45,15 @@ class SeaGet():
     benchmark = 0
 
     def __init__(self, baud, cont, filename, device, new_baud):
-        self.ser = serial.Serial(port=device, baudrate=baud, bytesize=8, parity='N', stopbits=1, timeout=self.timeout)
+        self.ser = Serial(port=device, baudrate=baud, bytesize=8, parity='N', stopbits=1, timeout=self.timeout)
         debug = self.debug
         #start diagnostic mode
         if debug > 0:
             print 'Start diagnostic mode'
         resp = self.send("\x1A")
         if resp[1] != "T" and resp[1] != "1":
-            print "Something went probably wrong"
-            print "Modus is " + resp[1]
-            quit()
+            sys.exit("Something has gone wrong. Modus is %s" % resp[1])
+
         #if you want a different baud rate you get it!
         if new_baud:
             if debug > 0:
@@ -64,12 +65,11 @@ class SeaGet():
             print 'Set mode /1'
         resp = self.send("/1")
         if resp[1] != "1":
-            print 'Couldn\'t set modus to 1'
-            print 'Failed with '+resp[0]
+            exit_msgs = ["Couldn't set modus to 1. Failed with %s" % resp[0], ]
             if re.match('Input Command Error', resp[0]) and baud != 38400:
-                print 'You probably set a higher baud rate, on a hd that has a bug'
-                print 'Turn the hd off and on again and try the default baud rate 38400'
-            quit()
+                exit_msgs.append('You probably set a higher baud rate, on a hd that has a bug.')
+                exit_msgs.append('Turn the hd off and on again and try the default baud rate 38400.')
+            sys.exit('\n'.join(exit_msgs))
 
     def send(self, command):
         #if this doesn't work for you try setting a greater timeout (to be on the safe side try 1)
@@ -89,20 +89,22 @@ class SeaGet():
                     break
                 incom.append(line)
             except:
-                print 'Failed to read line.Maybe the timeout is too low'
-                quit()
+                sys.exit('Failed to read line. Maybe the timeout is too low.')
+
         incom = "".join(incom)
         #You can (and have to) set different modi for the hd.
         #a different modus means you get a different set of commands
         #checking the modi after every command can be used for debugging and/or to verify that a command got executed correctly
         try:
             modus = re.findall('F3 (.)>', incom)
-            modus =modus[len(modus)-1]
+            modus = modus[len(modus)-1]
         except:
-            print 'Failed to execute regex.This usually means that you didn\'t get the whole message or nothing at all'
-            print 'Check your baud rate and timeout/zc'
-            print incom
-            quit()
+            exit_msgs = ["Failed to execute regex.",
+                         "This usually means that you didn't get the whole message or nothing at all.",
+                         "Check your baud rate and timeout/zc.",
+                         incom, ]
+            sys.exit(exit_msgs)
+
         return incom, modus
 
     def get_modus(self):
@@ -115,7 +117,7 @@ class SeaGet():
             print 'Changing mode to T'
             self.send("/T")
         self.send("B"+str(newbaud))
-        self.ser = serial.Serial(port=device, baudrate=newbaud, bytesize=8, parity='N', stopbits=1, timeout=self.timeout)
+        self.ser = Serial(port=device, baudrate=newbaud, bytesize=8, parity='N', stopbits=1, timeout=self.timeout)
         newmodus = self.send("/"+modus)[1]
         if newmodus==modus:
             return True
@@ -154,14 +156,14 @@ class SeaGet():
             memf = open(filename, 'r+')
             fsize = len(memf.read())
             if fsize % 512 != 0:
-                print filename+' seems to be corrupted (wrong file size)'
-                quit()
+                sys.exit('%s seems to be corrupted (wrong file size)' % filename)
+
             sj = math.trunc(fsize/512/64)
-            si=fsize/512-64*sj
+            si = fsize/512-64*sj
             if self.debug>0:
                 print 'Starting from '+str(sj)+' '+str(si)
         else:
-            memf = open(filename,'w')
+            memf = open(filename, 'w')
             fsize = 0
             sj, si = 0, 0
         k = fsize/512
