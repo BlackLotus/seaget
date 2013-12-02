@@ -110,7 +110,7 @@ class SeaGet():
     def get_modus(self):
         return self.send("")[1]
 
-    def set_baud(self,newbaud):
+    def set_baud(self, newbaud):
         modus = self.get_modus()
         print 'Setting baud to '+str(newbaud)
         if modus != "T":
@@ -119,10 +119,8 @@ class SeaGet():
         self.send("B"+str(newbaud))
         self.ser = Serial(port=device, baudrate=newbaud, bytesize=8, parity='N', stopbits=1, timeout=self.timeout)
         newmodus = self.send("/"+modus)[1]
-        if newmodus==modus:
-            return True
-        else:
-            return False
+
+        return modus == newmodus
 
     def parse(self, buff):
         hex = ""
