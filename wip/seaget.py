@@ -41,15 +41,15 @@ def get_arguments():
 
 
 class SeaGet():
-    debug = 0
-    timeout = 0.004
-    benchmark = 0
 
-    def __init__(self, baud, cont, filename, device, new_baud):
+    def __init__(self, baud, cont, filename, device, new_baud, debug=0, timeout=0.004, benchmark=0):
+        self.debug = debug
+        self.timeout = timeout
+        self.benchmark = benchmark
         self.ser = Serial(port=device, baudrate=baud, bytesize=8, parity='N', stopbits=1, timeout=self.timeout)
-        debug = self.debug
+
         #start diagnostic mode
-        if debug > 0:
+        if self.debug > 0:
             print('Start diagnostic mode')
         resp = self.send("\x1A")
         if resp[1] != "T" and resp[1] != "1":
@@ -57,12 +57,12 @@ class SeaGet():
 
         #if you want a different baud rate you get it!
         if new_baud:
-            if debug > 0:
+            if self.debug > 0:
                 print('Set new baud rate')
             self.set_baud(new_baud)
             baud = new_baud
         #set the right mode to access memory and buffer
-        if debug > 0:
+        if self.debug > 0:
             print('Set mode /1')
         resp = self.send("/1")
         if resp[1] != "1":
