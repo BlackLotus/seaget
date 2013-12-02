@@ -53,8 +53,8 @@ class SeaGet():
         if self.debug > 0:
             print('Start diagnostic mode')
         _, mode = self.send("\x1A")
-        if mode != "T" and mode != "1":
-            sys.exit("Something has gone wrong. Modus is %s" % mode)
+        if mode not in ['1', 'T']:
+            sys.exit("Something has gone wrong. Modus is %s (expected 1 or T)" % mode)
 
         #if you want a different baud rate you get it!
         if new_baud:
