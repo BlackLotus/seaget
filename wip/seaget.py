@@ -49,7 +49,6 @@ class SeaGet():
         while 1:
             try:
                 line=self.ser.readline()
-#                line=self.ser.read(1000)
                 if line=="":
                     zc+=1
                 else:
