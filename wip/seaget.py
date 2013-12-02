@@ -46,7 +46,8 @@ class SeaGet():
         self.debug = debug
         self.timeout = timeout
         self.benchmark = benchmark
-        self.ser = Serial(port=device, baudrate=baud, bytesize=8, parity='N', stopbits=1, timeout=self.timeout)
+        self.device = device
+        self.ser = Serial(port=self.device, baudrate=baud, bytesize=8, parity='N', stopbits=1, timeout=self.timeout)
 
         #start diagnostic mode
         if self.debug > 0:
@@ -118,7 +119,7 @@ class SeaGet():
             print('Changing mode to T')
             self.send("/T")
         self.send("B"+str(newbaud))
-        self.ser = Serial(port=device, baudrate=newbaud, bytesize=8, parity='N', stopbits=1, timeout=self.timeout)
+        self.ser = Serial(port=self.device, baudrate=newbaud, bytesize=8, parity='N', stopbits=1, timeout=self.timeout)
         newmodus = self.send("/"+modus)[1]
 
         return modus == newmodus
