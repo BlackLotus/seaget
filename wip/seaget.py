@@ -169,7 +169,6 @@ class SeaGet():
         k = fsize/512
         total = (64*128*512)/1000.0
         stime = time.time()  # start time
-        mem = []
         
         print('Starting memory dump')
         for j in range(sj, 64):
@@ -185,9 +184,39 @@ class SeaGet():
                 progress_bar(time.time()-stime, size*1000, total*1000)
         memf.close()
         
-    def dump_buffer(self):
-        pass
+    def dump_buffer(self,filename,cont):
+#not tested yet
+#so it's "experimental" I guess...
+#and I wouldn't use continue yet
+#and the file dump get's much too big because they loop the buffer over and over and I'm not quite sure if the buffer has always the same size
+        if cont:
+            bufff = open(filename, 'r+')
+            fsize = len(bufff.read())
+            if fsize % 512 != 0:
+                sys.exit('%s seems to be corrupted (wrong file size)' % filename)
+            sp = math.trunc(fsize/512)
+            if self.debug > 0:
+                print('Starting from %s' % (sp))
+        else:
+            bufff = open(filename, 'w')
+            fsize = 0
+            sp = 0
+        k = fsize/512
+        total = (65535*512)/1000.0
+        stime = time.time()  # start time
 
+        print ('Start buffer dump')
+
+        for i in range(sp,65535):
+            k += 1
+            zz = time.time()
+            bufff.write(self.read_buffer(hex(i)[2:])[1])
+            size = (k*512)/1000.0
+            if self.benchmark == 1:
+                speed = round(512/(time.time()-zz), 2)
+                percentage = round(100.0/total*size, 2)
+                minleft = round((time.time()-stime)/k*(247*128-k)/60, 2)
+            progress_bar(time.time()-stime, size*1000, total*1000)
 
 if __name__ == '__main__':
     main()
