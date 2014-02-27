@@ -3,7 +3,7 @@
 # Extract user and master passwords from Seagate hard drive ROM dumps
 #
 # Author: Derrick Karpo
-# Date:   February 26, 2013
+# Date:   February 26, 2014
 #
 
 import argparse
