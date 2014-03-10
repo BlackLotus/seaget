@@ -8,7 +8,7 @@
 
 import argparse
 from binascii import hexlify, unhexlify
-from re import findall
+from re import search
 import sys
 
 
@@ -19,16 +19,21 @@ def findPassword(romdump):
     # open the ROM dump and attempt to locate the user and master passwords
     try:
         rom = hexlify(romdump.read())
-        password = findall(PATTERN, rom)
+        password = search(PATTERN, rom)
 
-        if len(password) == 0:
-            sys.exit('No user or master passwords found.')
+        if not password:
+            sys.exit("No user or master passwords found in '%s'" % romdump.name)
 
-        for master, user in password:
-            print('{0:>15}: {1:}'.format("master HEX pw", master))
-            print('{0:>15}: {1:}'.format("master ASCII pw", unhexlify(master)))
-            print('{0:>15}: {1:}'.format("user HEX pw", user))
-            print('{0:>15}: {1:}'.format("user ASCII pw", unhexlify(user)))
+        # dump out the found passwords
+        master = password.group(1)
+        user = password.group(2)
+        print('{0:>15}: {1:}'.format("File name", romdump.name))
+        print('{0:>15}: {1:.0f}'.format("Byte offset", password.start()/2))
+        print('{0:>15}: {1:}'.format("master HEX pw", master))
+        print('{0:>15}: {1:}'.format("master ASCII pw", unhexlify(master)))
+        print('{0:>15}: {1:}'.format("user HEX pw", user))
+        print('{0:>15}: {1:}'.format("user ASCII pw", unhexlify(user)))
+        print()
     except IOError:
         sys.exit("Erroring processing file: %s" % romdump)
 
@@ -37,12 +42,12 @@ def main():
     # setup the argument parser for the command line arguments
     parser = argparse.ArgumentParser(
         prog='extract-seagate-password.py',
-        description='Find the user and master passwords in Seagate hard drive ROM dumps.')
-    parser.add_argument('romdump',
+        description='Extract user and master passwords from Seagate hard drive ROM dumps.')
+    parser.add_argument('romdump', nargs='+',
                         type=argparse.FileType('rb'),
-                        help='Seagate hard drive ROM dump file')
+                        help='Seagate hard drive ROM dump file(s)')
     parser.add_argument('-v', action='version',
-                        version='%(prog)s 0.1', help='Version')
+                        version='%(prog)s 0.2', help='Version')
     args = parser.parse_args()
 
     # output help and exit when no arguments are given
@@ -51,7 +56,8 @@ def main():
         return
 
     # attempt to locate the user and master passwords
-    findPassword(args.romdump)
+    for fn in args.romdump:
+        findPassword(fn)
 
 
 if __name__ == "__main__":
