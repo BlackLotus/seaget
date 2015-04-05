@@ -26,9 +26,9 @@ except ImportError:
 def main():
     args = get_arguments()
     see = SeaGet(args.baud, args.cont, args.filename, args.device, args.new_baud)
-    if args.dumptype=='memory':
+    if str(args.dumptype)=="['memory']":
         see.dump_memory(args.filename, args.cont)
-    elif args.dumptype=='buffer':
+    elif str(args.dumptype)=="['buffer']":
         see.dump_buffer(args.filename, args.cont)
 
 def get_arguments():
