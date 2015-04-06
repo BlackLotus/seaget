@@ -26,14 +26,14 @@ except ImportError:
 def main():
     args = get_arguments()
     see = SeaGet(args.baud, args.cont, args.filename, args.device, args.new_baud)
-    if args.dumptype=='memory':
+    if args.dumptype[0]=='memory':
         see.dump_memory(args.filename, args.cont)
     elif args.dumptype=='buffer':
         see.dump_buffer(args.filename, args.cont)
 
 def get_arguments():
     parser = ArgumentParser(description='Dump memory/buffer of a seagate hd using a serial connection.')
-    parser.add_argument('--dumptype', metavar='memory/buffer', nargs=1, default='memory', help='What gets dumped')
+    parser.add_argument('--dumptype', metavar='memory/buffer', nargs=1, default=['memory'], help='What gets dumped')
     parser.add_argument('--baud', metavar=38400, default=38400, help='current baud rate [38400,115200]')
     parser.add_argument('--new-baud', metavar=115200, default=False, help='set new baud rate [38400,115200]')
     parser.add_argument('-c', dest='cont', action='store_const', const=True, help='Continue dump')
