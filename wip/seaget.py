@@ -28,7 +28,7 @@ def main():
     see = SeaGet(args.baud, args.cont, args.filename, args.device, args.new_baud)
     if args.dumptype[0]=='memory':
         see.dump_memory(args.filename, args.cont)
-    elif args.dumptype=='buffer':
+    elif args.dumptype[0]=='buffer':
         see.dump_buffer(args.filename, args.cont)
 
 def get_arguments():
