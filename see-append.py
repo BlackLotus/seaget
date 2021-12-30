@@ -77,7 +77,7 @@ def init(device,baud,fast=fast):
             set_baud(ser,baud)
             ser = serial.Serial(port=device, baudrate=baud, bytesize=8,parity='N',stopbits=1,timeout=timeout)
         except:
-            print 'You probably already are on 11500 baud'
+            print 'You probably already are on 115200 baud'
     send(ser,"/1")
     return ser
 
